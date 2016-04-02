@@ -1,28 +1,41 @@
-<form method="post" enctype="multipart/form-data">
-    <input type="file" name="image" multiple accept="image/*,image/jpeg">
-    Введите ширину<input type="number" name="width" required>
-    Введите высоту<input type="number" name="width" required>
-    Введите угол поворота<input type="number" name="width" required>
-    <input type="submit" value="Показать">
-    <input type="submit" value="Показать оригинал">
-    
-</form>
-<?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST')
-{
-// Проверяем тип файла
-if (!in_array($_FILES['picture']['type'], $types))
-die('Запрещённый тип файла. <a href="?">Попробовать другой файл?</a>');
+<!-- Тип кодирования данных, enctype, ДОЛЖЕН БЫТЬ указан ИМЕННО так -->
+<form enctype="multipart/form-data" action="" method="POST">
 
-// Проверяем размер файла
-if ($_FILES['picture']['size'] > $size)
-die('Слишком большой размер файла. <a href="?">Попробовать другой файл?</a>');
-// Загрузка файла и вывод сообщения
-if (!@copy($_FILES['picture']['tmp_name'], $path . $_FILES['picture']['name'])) {
-    echo 'Что-то пошло не так';
+    <!-- Поле MAX_FILE_SIZE должно быть указано до поля загрузки файла -->
+    <input type="hidden" name="MAX_FILE_SIZE" value="100000" />
+    <br/>
+    <!-- Rotation-->
+    <input type="text" name="rotate" placeholder="rotation"/>
+    <br/>
+
+    <!-- Size width-->
+    <input type="text" name="width" placeholder="width"/>
+    <br/>
+    <!-- Size height-->
+    <input type="text" name="height" placeholder="height"/>
+    <br/>
+
+    <!-- Название элемента input определяет имя в массиве $_FILES -->
+    Отправить этот файл: <input name="image" type="file" />
+    <br/>
+    <input type="submit" value="Upload Image" />
+</form>
+
+<?php
+
+$uploaddir = '/images/';
+$uploadfile = $uploaddir . basename($_FILES['image']['name']);
+
+echo '<pre>';
+if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadfile)) {
+    echo "Файл корректен и был успешно загружен.\n";
+} else {
+    echo "Возможная атака с помощью файловой загрузки!\n";
 }
-else{
-echo 'Загрузка удачна <a href="$path . $_FILES['picture']['name'] . '">Посмотреть</a> '
-}
-}
+
+echo 'Некоторая отладочная информация:';
+print_r($_FILES);
+
+print "</pre>";
+
 ?>
